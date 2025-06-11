@@ -1,0 +1,2 @@
+# Onomatopoeia
+Gチーム用
