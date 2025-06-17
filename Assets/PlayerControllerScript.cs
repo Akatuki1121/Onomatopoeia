@@ -5,7 +5,7 @@ public class PlayerControllerScript : MonoBehaviour
 {
     // === プレイヤーの移動・視点設定 ===
     private const float MoveSpeed = 5f; // 移動速度
-    private const float MouseSensitivity = 2f; // マウス感度
+    private const float MouseSensitivity = 5f; // マウス感度
 
     // === カメラ・衝突設定 ===
     private const float CameraDefaultY = 1.6f; // カメラのデフォルト高さ
