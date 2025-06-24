@@ -23,7 +23,19 @@ public class EyecastrScript : MonoBehaviour
         {
             AttachImage();
         }
+        //デバッグ用にQ/Eキーにも割り当て
+        // QでImage回収
+        if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
+        {
+            CollectImage();
+        }
+        // EでImageを付ける
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            AttachImage();
+        }
     }
+
 
     void CollectImage()
     {
