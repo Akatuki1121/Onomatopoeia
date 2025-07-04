@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// 調べられるオブジェクトに吹き出しUIを表示・非表示するスクリプト
 public class SearchableObjectScript : MonoBehaviour
 {
     private GameObject currentBubble;
