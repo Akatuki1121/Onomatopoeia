@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // 目線インタラクトやUI表示・オノマトペの記憶管理を行うスクリプト
-public class EyecastrScript : MonoBehaviour
+public class EyecastScript : MonoBehaviour
 {
     [SerializeField] private GameObject bubbleImageUI;
     [SerializeField] private GameObject bubblePrefab;    //吹き出し    

@@ -17,6 +17,7 @@ public class SearchableObjectScript : MonoBehaviour
 
     }
 
+    //‚«o‚µ‚ğo‚·
     public void ShowBubble(GameObject bubblePrefab)
     {
         if (currentBubble == null)
@@ -26,6 +27,7 @@ public class SearchableObjectScript : MonoBehaviour
         }
     }
 
+    //‚«o‚µ‚ğÁ‚·
     public void HideBubble()
     {
         if (currentBubble != null)
