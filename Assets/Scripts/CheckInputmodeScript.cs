@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Linq;
 using UnityEngine.InputSystem.Controls;
+
+// 入力デバイス（キーボード/ゲームパッド）の判定を行うスクリプト
 public class CheckInputmodeScript : MonoBehaviour
 {
     public enum InputMode { Keyboard, Gamepad }

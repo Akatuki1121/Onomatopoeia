@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// プレイヤーの移動とカメラ操作を管理するスクリプト
 public class PlayerControllerScript : MonoBehaviour
 {
     // === プレイヤーの移動・視点設定 ===

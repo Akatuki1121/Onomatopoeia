@@ -2,110 +2,89 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// 目線インタラクトやUI表示・オノマトペの記憶管理を行うスクリプト
 public class EyecastrScript : MonoBehaviour
 {
     [SerializeField] private GameObject bubbleImageUI;
     [SerializeField] private GameObject bubblePrefab;    //吹き出し    
     private InteractableObject currentObj;
 
-    // オノマトペ種別ごとに1つだけ記憶
-    private Dictionary<string, OnomatopeData> onomatopeCollection = new();
+    // オノマトペ種別ごとに1つだけ記憶（テクスチャ保存に変更）
+    private Dictionary<string, Texture> onomatopeCollection = new();
 
     void Update()
     {
-        //Aで調べる
+        //Aボタン/Qキーで調べる
+        if ((Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame) ||
+            (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame))
+        {
+            SearchInteractable();
+        }
 
-        // L2でImage回収
+        // L2でオノマトペ回収
         if (Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame)
         {
-            CollectImage();
+            CollectOnomatope();
         }
-
-        // R2でImageを付ける
+        // R2でオノマトペ貼り付け
         if (Gamepad.current != null && Gamepad.current.rightTrigger.wasPressedThisFrame)
         {
-            AttachImage();
+            AttachOnomatope();
         }
-
-        //デバッグ用にQ/Eキーにも割り当て
-        //Fで調べる
-        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
-        {
-            Debug.Log("Fキーが押されました");
-            SearchObject();
-
-        }
-        // QでImage回収
-        if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
-        {
-            Debug.Log("Qキーが押されました");
-            CollectImage();
-        }
-        // EでImageを付ける
+        // デバッグ用Q/Eキー
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
-            Debug.Log("Eキーが押されました");
-            AttachImage();
+            AttachOnomatope();
         }
     }
 
-    void SearchObject()
+    // 調べる：目線先のInteractableObjectをcurrentObjにセットしUI表示
+    void SearchInteractable()
     {
         Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-
         if (Physics.Raycast(ray, out RaycastHit hit, 3f))
         {
-            SearchableObjectScript searchable = hit.collider.GetComponent<SearchableObjectScript>();
-            if (searchable != null)
+            var interactable = hit.collider.GetComponent<InteractableObject>();
+            if (interactable != null)
             {
-                searchable.ShowBubble(bubblePrefab);
-                Debug.Log("調べる処理を実行しました");
-            }
-            else
-            {
-                Debug.Log("調べられるオブジェクトがありません");
+                currentObj = interactable;
+                if (bubbleImageUI != null) bubbleImageUI.SetActive(true);
             }
         }
     }
 
-    void CollectImage()
+    // オノマトペ回収：テクスチャ保存＆非表示
+    void CollectOnomatope()
     {
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 3f))
+        if (currentObj != null)
         {
-            InteractableObject interactable = hit.collider.GetComponent<InteractableObject>();
-
-            if (bubbleImageUI != null && bubbleImageUI.activeSelf && currentObj != null)
+            string type = currentObj.OnomatopeType;
+            if (onomatopeCollection.ContainsKey(type))
             {
-                string type = currentObj.OnomatopeType; // InteractableObjectにOnomatopeTypeプロパティが必要
-
-                // 既に同じ種類を持っていたら奪えない
-                if (onomatopeCollection.ContainsKey(type))
-                {
-                    Debug.Log("既にこの種類のオノマトペは記憶済みです。");
-                    return;
-                }
-
-                Color color = currentObj.TakeColor(); // 色を奪うメソッド（要実装）
-                onomatopeCollection[type] = gameObject.AddComponent<OnomatopeData>();
-
-                //吹き出し削除
-                Destroy(interactable.gameObject);
-                Debug.Log($"「{type}」を回収してプレハブを削除しました");
-
-                bubbleImageUI.SetActive(false);
-                currentObj = null;
+                Debug.Log("既にこの種類のオノマトペは記憶済みです。");
+                return;
             }
+            Texture tex = currentObj.TakeTexture();
+            onomatopeCollection[type] = tex;
+            currentObj.HideOnomatope(); // 非表示
+            if (bubbleImageUI != null) bubbleImageUI.SetActive(false);
+            Debug.Log($"{type}のオノマトペを回収しました");
         }
     }
 
-    void AttachImage()
+    // オノマトペ貼り付け：保存したテクスチャをcurrentObjに貼り付け＆表示
+    void AttachOnomatope()
     {
-        if (currentObj != null && bubbleImageUI != null && !bubbleImageUI.activeSelf)
+        if (currentObj != null)
         {
-            bubbleImageUI.SetActive(true);
-            // 必要に応じてcurrentObjに何かする
+            string type = currentObj.OnomatopeType;
+            if (onomatopeCollection.TryGetValue(type, out Texture tex))
+            {
+                currentObj.ApplyTexture(tex);
+                currentObj.ShowOnomatope();
+                Debug.Log($"{type}のオノマトペを貼り付けました");
+            }
         }
     }
 }
+
