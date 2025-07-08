@@ -22,7 +22,8 @@ public class EyecastScript : MonoBehaviour
         }
 
         // L2でオノマトペ回収
-        if (Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame)
+        if ((Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame)||
+            (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame))
         {
             CollectOnomatope();
         }
