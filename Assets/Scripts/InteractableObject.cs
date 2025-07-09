@@ -6,9 +6,7 @@ public class InteractableObject : MonoBehaviour
     [SerializeField] private string onomatopeType; // オノマトペ種別（Inspectorで設定）
     [SerializeField] private Texture onomatopeTexture; // オノマトペ用テクスチャ
     [SerializeField] private Texture defaultTexture; // デフォルトテクスチャ
-    [SerializeField] private Animator animator; // オブジェクトのアニメーター（任意）
-    [SerializeField] private string onomatopeAnimName; // オノマトペ用アニメーション名
-    [SerializeField] private string defaultAnimName; // デフォルトアニメーション名
+
 
     // オノマトペ種別を取得
     public string OnomatopeType => onomatopeType;
@@ -34,23 +32,7 @@ public class InteractableObject : MonoBehaviour
         {
             Debug.Log("Rendererが見つかりません。");
         }
-        // アニメーションもデフォルトに戻す
-        if (animator != null)
-        {
-            if (!string.IsNullOrEmpty(defaultAnimName))
-            {
-                animator.Play(defaultAnimName);
-            }
-            else
-            {
-                Debug.Log("デフォルトアニメーション名が未設定です。");
-            }
-        }
-        else
-        {
-            Debug.Log("Animatorが見つかりません。");
-        }
-        return taken;
+        return taken; // 必ず値を返すように修正
     }
 
     // オノマトペのテクスチャを貼り付け
@@ -71,22 +53,6 @@ public class InteractableObject : MonoBehaviour
         else
         {
             Debug.Log("Rendererが見つかりません。");
-        }
-        // オノマトペ用アニメーション再生
-        if (animator != null)
-        {
-            if (!string.IsNullOrEmpty(onomatopeAnimName))
-            {
-                animator.Play(onomatopeAnimName);
-            }
-            else
-            {
-                Debug.Log("オノマトペ用アニメーション名が未設定です。");
-            }
-        }
-        else
-        {
-            Debug.Log("Animatorが見つかりません。");
         }
     }
 

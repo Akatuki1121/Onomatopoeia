@@ -6,7 +6,7 @@ public class PlayerOnomatopeInventory : MonoBehaviour
     public static PlayerOnomatopeInventory Instance { get; private set; }
 
     // 1種類につき1つだけ保持（所持中のオノマトペ）
-    private Dictionary<string, OnomatopeType> ownedOnomatope = new();
+    private Dictionary<string, (Texture texture, string animName)> ownedOnomatope = new();
 
     private void Awake()
     {
@@ -25,32 +25,37 @@ public class PlayerOnomatopeInventory : MonoBehaviour
     public bool HasOnomatope(string type) => ownedOnomatope.ContainsKey(type);
 
     // オノマトペを追加（1種類につき1つだけ）
-    public bool AddOnomatope(OnomatopeType data)
+    public bool AddOnomatope(string type, Texture texture, string animName)
     {
-        if (data == null || string.IsNullOrEmpty(data.type))
+        if (string.IsNullOrEmpty(type) || texture == null)
         {
             Debug.Log("追加するオノマトペデータが不正です。");
             return false;
         }
-        if (HasOnomatope(data.type))
+        if (HasOnomatope(type))
         {
-            Debug.Log($"{data.type}は既に所持しています。");
+            Debug.Log($"{type}は既に所持しています。");
             return false;
         }
-        ownedOnomatope[data.type] = data;
-        Debug.Log($"{data.type}のオノマトペを所持リストに追加しました。");
+        ownedOnomatope[type] = (texture, animName);
+        Debug.Log($"{type}のオノマトペを所持リストに追加しました。");
         return true;
     }
 
     // 指定した種類のオノマトペを取得
-    public OnomatopeType GetOnomatope(string type)
+    public (Texture texture, string animName)? GetOnomatope(string type)
     {
-        ownedOnomatope.TryGetValue(type, out var data);
-        return data;
+        if (ownedOnomatope.TryGetValue(type, out var data))
+            return data;
+        return null;
     }
 
     // 全ての所持オノマトペを取得
-    public IEnumerable<OnomatopeType> GetAll() => ownedOnomatope.Values;
+    public IEnumerable<(string type, Texture texture, string animName)> GetAll()
+    {
+        foreach (var kv in ownedOnomatope)
+            yield return (kv.Key, kv.Value.texture, kv.Value.animName);
+    }
 
     // オノマトペを削除
     public bool RemoveOnomatope(string type)
@@ -63,7 +68,5 @@ public class PlayerOnomatopeInventory : MonoBehaviour
         Debug.Log($"{type}のオノマトペは所持していません。");
         return false;
     }
-
-
 }
 
