@@ -38,8 +38,7 @@ public class InteractableObject : MonoBehaviour
     // オノマトペのテクスチャを貼り付け
     public void ApplyTexture(Texture texture)
     {
-        var renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        if (TryGetComponent<Renderer>(out var renderer))
         {
             if (texture != null)
             {
@@ -59,8 +58,7 @@ public class InteractableObject : MonoBehaviour
     // オノマトペを非表示にする（回収時）
     public void HideOnomatope()
     {
-        var renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        if (TryGetComponent<Renderer>(out var renderer))
         {
             renderer.enabled = false;
         }
@@ -73,8 +71,7 @@ public class InteractableObject : MonoBehaviour
     // オノマトペを表示する（貼り付け時）
     public void ShowOnomatope()
     {
-        var renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        if (TryGetComponent<Renderer>(out var renderer))
         {
             renderer.enabled = true;
         }

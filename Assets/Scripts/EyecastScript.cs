@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,45 +5,75 @@ using UnityEngine.InputSystem;
 // 目線インタラクトやUI表示・オノマトペの記憶管理を行うスクリプト
 public class EyecastScript : MonoBehaviour
 {
-
     private InteractableObject currentObj;
-
-    // オノマトペ種別ごとに1つだけ記憶（テクスチャ保存に変更）
     private Dictionary<string, Texture> onomatopeCollection = new();
 
     void Update()
     {
-        //Aボタン/Qキーで調べる
-        if ((Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame) ||
-            (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame))
+        // 入力モードで分岐
+        if (CheckInputmodeScript.CurrentInputMode == CheckInputmodeScript.InputMode.Gamepad)
         {
-            SearchInteractable();
+            //Aボタンで調べる
+            if (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
+            {
+                SearchInteractable();
+            }
+            // L2でオノマトペ回収
+            if (Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame)
+            {
+                CollectOnomatope();
+            }
+            // R2でオノマトペ貼り付け
+            if (Gamepad.current != null && Gamepad.current.rightTrigger.wasPressedThisFrame)
+            {
+                AttachOnomatope();
+            }
         }
-
-        // L2でオノマトペ回収
-        if ((Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame) ||
-            (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame))
+        else // Keyboard
         {
-            CollectOnomatope();
-        }
-        // R2でオノマトペ貼り付け
-        if (Gamepad.current != null && Gamepad.current.rightTrigger.wasPressedThisFrame)
-        {
-            AttachOnomatope();
-        }
-        // デバッグ用Eキー(オノマトペ貼り付け)
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            AttachOnomatope();
+            //Qキーで調べる
+            if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
+            {
+                SearchInteractable();
+            }
+            // Rキーでオノマトペ回収
+            if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+            {
+                CollectOnomatope();
+            }
+            // Eキーでオノマトペ貼り付け
+            if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            {
+                AttachOnomatope();
+            }
         }
     }
 
-    private void SearchInteractable()
+    private bool SearchInteractable()
     {
-        throw new NotImplementedException();
+        Camera cam = Camera.main;
+        Ray ray = new(cam.transform.position, cam.transform.forward);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 3f)) // 3メートル以内で判定
+        {
+            if (hit.collider.TryGetComponent<InteractableObject>(out var interactable))
+            {
+                currentObj = interactable;
+                Debug.Log("目の前にオブジェクトが見つかりました");
+                return true;
+            }
+            else
+            {
+                currentObj = null;
+                return false;
+            }
+        }
+        else
+        {
+            currentObj = null;
+            return false;
+        }
     }
-
-
 
     // オノマトペ回収
     void CollectOnomatope()
@@ -60,7 +89,6 @@ public class EyecastScript : MonoBehaviour
             Texture tex = currentObj.TakeTexture();
             onomatopeCollection[type] = tex;
             currentObj.HideOnomatope(); // 非表示
-
         }
     }
 

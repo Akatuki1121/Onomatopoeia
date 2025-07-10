@@ -7,23 +7,22 @@ public class PlayerControllerScript : MonoBehaviour
     // === プレイヤーの移動・視点設定 ===
     private const float MoveSpeed = 5f; // 移動速度
     private const float MouseSensitivity = 5f; // マウス感度
+    private const float CameraSpeedGamepad = 15f; // コントローラー時のカメラ移動速度
 
     // === カメラ・衝突設定 ===
-    private const float CameraDefaultY = 1.6f; // カメラのデフォルト高さ
+    private const float CameraDefaultX = 0f; // カメラの通常位置
+    private const float CameraDefaultY = 1.6f; //カメラのデフォルト高さ
+    private const float CameraDefaultZ = 1.0f; // カメラの通常位置
+
     private const float CameraCollisionRadius = 0.2f; // カメラ衝突の判定半径
     private const float SphereCastDistance = CameraDefaultY * 3.0f; // カメラの衝突判定距離（壁にめり込まないよう拡張）
     private const float VerticalRotationMin = -90f; // 上方向の視点限界
     private const float VerticalRotationMax = 90f; // 下方向の視点限界
 
-    // === 数値の一貫性を保つための定数化 ===
-    private const float Zero = 0f;
-    private const float One = 1f;
-    private const float MinusOne = -1f;
-
     public Transform cameraTransform; // カメラのTransform
     public LayerMask collisionMask; // 衝突判定用のレイヤー
 
-    private float verticalRotation = Zero; // カメラの上下回転値
+    private float verticalRotation = 0f; // カメラの上下回転値
     private Vector2 moveInput; // 移動入力（WSAD）
     private Vector2 lookInput; // 視点入力（マウス・矢印キー）
     private Rigidbody rb; // Rigidbody参照
@@ -41,10 +40,10 @@ public class PlayerControllerScript : MonoBehaviour
         lookInput = GetLookInput(); // 視点入力取得
 
         // === 視点回転処理 ===
-        transform.Rotate(Zero, lookInput.x, Zero); // 左右回転
+        transform.Rotate(0f, lookInput.x, 0f); // 左右回転
         verticalRotation -= lookInput.y; // 上下視点の変化
         verticalRotation = Mathf.Clamp(verticalRotation, VerticalRotationMin, VerticalRotationMax); // 視点の範囲制限
-        cameraTransform.localEulerAngles = new Vector3(verticalRotation, Zero, Zero); // カメラ角度設定
+        cameraTransform.localEulerAngles = new Vector3(verticalRotation, 0f, 0f); // カメラ角度設定
 
         // === カメラの壁衝突判定 ===
         UpdateCameraPosition();
@@ -59,32 +58,44 @@ public class PlayerControllerScript : MonoBehaviour
 
     private Vector2 GetMoveInput()
     {
-        if (Keyboard.current == null)
-            return Vector2.zero;
-
-        float x = Zero;
-        float y = Zero;
-        if (Keyboard.current.wKey.isPressed) y += One; // 前進
-        if (Keyboard.current.sKey.isPressed) y += MinusOne; // 後退
-        if (Keyboard.current.aKey.isPressed) x += MinusOne; // 左移動
-        if (Keyboard.current.dKey.isPressed) x += One; // 右移動
-        return new Vector2(x, y);
+        // 入力モードで分岐
+        if (CheckInputmodeScript.CurrentInputMode == CheckInputmodeScript.InputMode.Gamepad)
+        {
+            if (Gamepad.current == null) return Vector2.zero;
+            Vector2 stick = Gamepad.current.leftStick.ReadValue();
+            return new Vector2(stick.x, stick.y); // 左スティックで移動
+        }
+        else // Keyboard
+        {
+            if (Keyboard.current == null) return Vector2.zero;
+            float x = 0f;
+            float y = 0f;
+            if (Keyboard.current.wKey.isPressed) y += 1f; // 前進
+            if (Keyboard.current.sKey.isPressed) y += -1f; // 後退
+            if (Keyboard.current.aKey.isPressed) x += -1f; // 左移動
+            if (Keyboard.current.dKey.isPressed) x += 1f; // 右移動
+            return new Vector2(x, y);
+        }
     }
 
     private Vector2 GetLookInput()
     {
-        if (Mouse.current == null && Keyboard.current == null)
-            return Vector2.zero;
-
-        // === マウス視点入力 ===
-        Vector2 mouseDelta = Mouse.current != null ? MouseSensitivity * Time.deltaTime * Mouse.current.delta.ReadValue() : Vector2.zero;
-
-        // === 矢印キー視点入力 ===
-        float arrowX = Keyboard.current.rightArrowKey.isPressed ? One : Keyboard.current.leftArrowKey.isPressed ? MinusOne : Zero;
-        float arrowY = Keyboard.current.upArrowKey.isPressed ? One : Keyboard.current.downArrowKey.isPressed ? MinusOne : Zero;
-        Vector2 arrowInput = MouseSensitivity * Time.deltaTime * new Vector2(arrowX, arrowY);
-
-        return mouseDelta + arrowInput; // 両方の入力を統合
+        // 入力モードで分岐
+        if (CheckInputmodeScript.CurrentInputMode == CheckInputmodeScript.InputMode.Gamepad)
+        {
+            if (Gamepad.current == null) return Vector2.zero;
+            Vector2 rightStick = Gamepad.current.rightStick.ReadValue();
+            return MouseSensitivity * CameraSpeedGamepad * Time.deltaTime * rightStick; // 右スティックで視点移動
+        }
+        else // Keyboard+Mouse
+        {
+            if (Mouse.current == null && Keyboard.current == null) return Vector2.zero;
+            Vector2 mouseDelta = Mouse.current != null ? MouseSensitivity * Time.deltaTime * Mouse.current.delta.ReadValue() : Vector2.zero;
+            float arrowX = Keyboard.current.rightArrowKey.isPressed ? 1f : Keyboard.current.leftArrowKey.isPressed ? -1f : 0f;
+            float arrowY = Keyboard.current.upArrowKey.isPressed ? 1f : Keyboard.current.downArrowKey.isPressed ? -1f : 0f;
+            Vector2 arrowInput = MouseSensitivity * Time.deltaTime * new Vector2(arrowX, arrowY);
+            return mouseDelta + arrowInput;
+        }
     }
 
     private void UpdateCameraPosition()
@@ -99,6 +110,6 @@ public class PlayerControllerScript : MonoBehaviour
             return;
         }
 
-        cameraTransform.localPosition = new Vector3(Zero, CameraDefaultY, Zero); // カメラの通常位置
+        cameraTransform.localPosition = new Vector3(CameraDefaultX, CameraDefaultY, CameraDefaultZ); // カメラの通常位置
     }
 }
