@@ -458,7 +458,6 @@ GameObject:
   - component: {fileID: 615339554}
   - component: {fileID: 615339553}
   - component: {fileID: 615339557}
-  - component: {fileID: 615339558}
   m_Layer: 0
   m_Name: Onomatope_A_Object
   m_TagString: Untagged
@@ -571,18 +570,6 @@ MonoBehaviour:
   onomatopeType: A
   onomatopeTexture: {fileID: 0}
   defaultTexture: {fileID: 0}
---- !u!114 &615339558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 615339552}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6518af46adb995a4c9243835a394a116, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -950,7 +937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62607695dc1c97c4685d05bf626fb65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onomatopeType: 
+  onomatopeType: "\u30AC\u30C1\u30E3\u30C3"
   onomatopeTexture: {fileID: 0}
   defaultTexture: {fileID: 0}
 --- !u!4 &1224705790 stripped
@@ -1198,6 +1185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741386491847c4d4e8b091a086a89c23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bubblePrefab: {fileID: 0}
 --- !u!1001 &1282856101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1593,8 +1581,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635187633}
+  - component: {fileID: 1635187634}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: InputModeObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1615,6 +1604,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1635187634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635187629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dd26ff16ee03b64b8aba7902ec0ad48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1857723148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1860,7 +1861,7 @@ GameObject:
   - component: {fileID: 1985047279}
   - component: {fileID: 1985047280}
   m_Layer: 0
-  m_Name: RememberOnomatope
+  m_Name: PlayerOnomatope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1893,6 +1894,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb08543a891bbb84c90d24d61d186991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnOnomatopeAdded:
+    m_PersistentCalls:
+      m_Calls: []
+  OnOnomatopeAddFailed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1905,8 +1912,8 @@ SceneRoots:
   - {fileID: 1860831579}
   - {fileID: 1028540446}
   - {fileID: 889158566}
-  - {fileID: 1985047279}
   - {fileID: 1184534695}
   - {fileID: 1313846840}
   - {fileID: 1474628125}
   - {fileID: 1635187633}
+  - {fileID: 1985047279}

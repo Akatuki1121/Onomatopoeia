@@ -1,83 +1,83 @@
 using UnityEngine;
 
-// オノマトペオブジェクトのインタラクトやテクスチャ・動きの管理を行うスクリプト
+// オノマトペオブジェクトのインタラクトやテクスチャ・吹き出しUI管理を行うスクリプト
 public class InteractableObject : MonoBehaviour
 {
-    [SerializeField] private string onomatopeType; // オノマトペ種別（Inspectorで設定）
+    [SerializeField] private string onomatopeType;     // オノマトペ種別（Inspectorで設定）
     [SerializeField] private Texture onomatopeTexture; // オノマトペ用テクスチャ
-    [SerializeField] private Texture defaultTexture; // デフォルトテクスチャ
+    [SerializeField] private Texture defaultTexture;   // デフォルトテクスチャ
+    private GameObject currentBubble;                  // 現在表示中の吹き出しUI
 
-
-    // オノマトペ種別を取得
+    // 外部から参照できるプロパティ
     public string OnomatopeType => onomatopeType;
+    public Texture OnomatopeTexture => onomatopeTexture;
 
-    // オノマトペのテクスチャを取得
+    /// <summary>
+    /// オノマトペを回収するときに呼ぶ。
+    /// 現在のマテリアルを defaultTexture に戻し、
+    /// onomatopeTexture を返す。
+    /// </summary>
     public Texture TakeTexture()
     {
-        var renderer = GetComponent<Renderer>();
-        Texture taken = null;
-        if (renderer != null)
+        if (TryGetComponent<Renderer>(out var rend))
         {
-            taken = renderer.material.mainTexture;
-            if (defaultTexture != null)
-            {
-                renderer.material.mainTexture = defaultTexture; // 回収時はデフォルトに戻す
-            }
-            else
-            {
-                Debug.Log("デフォルトテクスチャが未設定です。");
-            }
+            rend.material.mainTexture = defaultTexture != null
+                ? defaultTexture
+                : rend.material.mainTexture;
+            return onomatopeTexture;
         }
-        else
-        {
-            Debug.Log("Rendererが見つかりません。");
-        }
-        return taken; // 必ず値を返すように修正
+
+        Debug.LogError("Renderer が見つかりません。");
+        return null;
     }
 
-    // オノマトペのテクスチャを貼り付け
+    /// <summary>
+    /// 指定のテクスチャを貼り付ける（Attach 時に使用）
+    /// </summary>
     public void ApplyTexture(Texture texture)
     {
-        if (TryGetComponent<Renderer>(out var renderer))
+        if (texture == null)
         {
-            if (texture != null)
-            {
-                renderer.material.mainTexture = texture;
-            }
-            else
-            {
-                Debug.Log("貼り付けるテクスチャが未設定です。");
-            }
+            Debug.LogError("貼り付けるテクスチャが null です。");
+            return;
+        }
+
+        if (TryGetComponent<Renderer>(out var rend))
+        {
+            rend.material.mainTexture = texture;
         }
         else
         {
-            Debug.Log("Rendererが見つかりません。");
+            Debug.LogError("Renderer が見つかりません。");
         }
     }
 
-    // オノマトペを非表示にする（回収時）
-    public void HideOnomatope()
+
+    /// <summary>
+    /// 吹き出しを表示する（bubblePrefab は外部から渡す）
+    /// </summary>
+    public void ShowBubble(GameObject bubblePrefab)
     {
-        if (TryGetComponent<Renderer>(out var renderer))
+        if (currentBubble == null && bubblePrefab != null)
         {
-            renderer.enabled = false;
-        }
-        else
-        {
-            Debug.Log("Rendererが見つかりません。");
+            currentBubble = Instantiate(
+                bubblePrefab,
+                transform.position + (Vector3.up * 1.5f),
+                Quaternion.identity,
+                transform
+            );
         }
     }
 
-    // オノマトペを表示する（貼り付け時）
-    public void ShowOnomatope()
+    /// <summary>
+    /// 吹き出しを非表示にする
+    /// </summary>
+    public void HideBubble()
     {
-        if (TryGetComponent<Renderer>(out var renderer))
+        if (currentBubble != null)
         {
-            renderer.enabled = true;
-        }
-        else
-        {
-            Debug.Log("Rendererが見つかりません。");
+            Destroy(currentBubble);
+            currentBubble = null;
         }
     }
 }

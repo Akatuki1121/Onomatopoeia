@@ -1,6 +1,6 @@
 using UnityEngine;
 //ドアが開くためのクラス
-public class DoorSc : MonoBehaviour
+public class DoorScript : MonoBehaviour
 {
     private bool isOpening = false;
     private bool isOpened = false;
@@ -8,13 +8,6 @@ public class DoorSc : MonoBehaviour
     [SerializeField] private float openAngle = 90f;     // 開く角度
     [SerializeField] private float openSpeed = 90f;     // 回転速度
     [SerializeField] private bool openOutward = true;   // 外開き or 内開き
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()
